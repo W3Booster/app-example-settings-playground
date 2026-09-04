@@ -1,14 +1,15 @@
 {
-  "name": "@w3booster/app-settings-playground",
+  "name": "@w3booster/app-example-settings-playground",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Settings Playground — a standalone W3Booster TypeScript example",
   "license": "MIT",
-  "repository": "https://github.com/W3Booster/app-settings-playground",
+  "repository": "https://github.com/W3Booster/app-example-settings-playground",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && node --test scripts/fork.test.mjs",
+    "app:fork": "node scripts/fork.mjs",
     "build": "npm run check && vite build && node scripts/manifest.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
     "test:browser": "node scripts/browser-test.mjs",

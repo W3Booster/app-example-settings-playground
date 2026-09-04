@@ -22,7 +22,7 @@ const shell = element('main', '', 'shell');
 const header = element('header');
 const brand = element('a', presentation.brand, 'brand'); brand.href = 'https://website.w3booster.com/developer/examples/'; header.append(brand);
 const headerActions = element('div', '', 'header-actions');
-const repository = element('a', 'Public repository ↗', 'repository-link'); repository.href = 'https://github.com/W3Booster/app-settings-playground'; repository.target = '_blank'; repository.rel = 'noopener noreferrer';
+const repository = element('a', 'Public repository ↗', 'repository-link'); repository.href = 'https://github.com/W3Booster/app-example-settings-playground'; repository.target = '_blank'; repository.rel = 'noopener noreferrer';
 const badge = element('span', demo ? 'DEMO DATA' : 'LIVE CONNECTION', 'badge'); headerActions.append(badge, repository); header.append(headerActions);
 const intro = element('div', '', 'intro');
 const appTitle = element('h1', presentation.title);
@@ -45,10 +45,10 @@ if (demo) {
 const open = element('button', 'Open compact window'); open.disabled = true; controls.append(open);
 const feedback = element('p', '', 'notice'); feedback.setAttribute('role', 'status');
 const footer = element('footer');
-for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
+for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
   const link = element('a', text); link.href = href; footer.append(link);
 }
-const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-settings-playground/blob/main/src/render.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
+const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-settings-playground/blob/main/src/render.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
 shell.append(header, intro);
 shell.append(controls, status, content, feedback, diagnostic, footer); root.replaceChildren(shell);
 const demoOptions = demo ? { state: (await import('./scenarios')).scenarioState(query.get('scenario') || 'match'), interval: query.get('capture') === '1' || ['no-match', 'finished'].includes(query.get('scenario') || '') ? 0 : 1000 } : undefined;

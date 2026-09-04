@@ -2,15 +2,15 @@
 
 Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.
 
-[Try it now](https://w3booster.github.io/app-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://github.com/W3Booster/app-examples)
+[Try it now](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://github.com/W3Booster/app-examples)
 
 ## Run locally
 
 Node.js 22.22.3 or newer. No account, Warcraft III, desktop client, or database needed for demo mode.
 
 ```sh
-git clone https://github.com/W3Booster/app-settings-playground.git
-cd app-settings-playground
+git clone https://github.com/W3Booster/app-example-settings-playground.git
+cd app-example-settings-playground
 npm ci
 npm run dev
 ```
@@ -28,7 +28,7 @@ The checked-in binding belongs to the official Settings Playground app. Cloning 
 3. Bind your new public client ID:
 
    ```sh
-   npx w3booster-settings init YOUR_CLIENT_ID --endpoint https://api.w3booster.com
+   npm run app:fork -- YOUR_NEW_CLIENT_ID
    ```
 
 4. Commit the generated binding and package.json. Use **Test locally** with `http://localhost:5173/?demo=0`, then launch through W3Booster.
