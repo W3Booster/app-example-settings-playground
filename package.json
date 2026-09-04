@@ -1,0 +1,36 @@
+{
+  "name": "@w3booster/app-settings-playground",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Settings Playground — a standalone W3Booster TypeScript example",
+  "license": "MIT",
+  "repository": "https://github.com/W3Booster/app-settings-playground",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "check": "tsc --noEmit",
+    "build": "npm run check && vite build && node scripts/manifest.mjs",
+    "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
+    "test:browser": "node scripts/browser-test.mjs",
+    "screenshots": "npm run build && node scripts/browser-test.mjs --screenshot",
+    "w3booster:sync": "w3booster-settings",
+    "w3booster:check": "w3booster-settings --check"
+  },
+  "engines": {
+    "node": ">=22.22.3"
+  },
+  "dependencies": {
+    "@w3booster/sdk": "1.0.3"
+  },
+  "devDependencies": {
+    "vite": "8.2.2",
+    "typescript": "~6.0.3",
+    "playwright": "^1.62.1",
+    "@types/node": "^22.0.0"
+  },
+  "w3booster": {
+    "clientId": "app_d3091e0d2c64c7bb03231375",
+    "settingsOutput": "src/w3booster.generated.ts",
+    "endpoint": "https://api.w3booster.com"
+  }
+}

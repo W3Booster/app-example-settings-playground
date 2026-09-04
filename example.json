@@ -1,0 +1,6 @@
+{
+  "slug": "settings-playground",
+  "repository": "https://github.com/W3Booster/app-settings-playground",
+  "theme": "workbench",
+  "overlay": false
+}

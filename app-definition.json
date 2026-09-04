@@ -1,0 +1,39 @@
+{
+  "name": "Settings Playground",
+  "description": "Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.",
+  "surfaces": [
+    "application"
+  ],
+  "applicationUrl": "http://localhost:5173/?demo=0",
+  "scopes": [
+    "match:read",
+    "players:read",
+    "resources:read",
+    "heroes:read",
+    "overlay:read"
+  ],
+  "settingsSchema": {
+    "version": 1,
+    "sections": [
+      {
+        "id": "display",
+        "title": "Display",
+        "groups": [
+          {
+            "id": "appearance",
+            "title": "Appearance"
+          }
+        ],
+        "fields": [
+          {
+            "key": "display.title",
+            "label": "App title",
+            "type": "text",
+            "group": "appearance",
+            "default": "My first W3Booster app"
+          }
+        ]
+      }
+    ]
+  }
+}
