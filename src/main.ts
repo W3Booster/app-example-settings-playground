@@ -1,20 +1,20 @@
 import './style.css';
-import { canUseHostCapability, classifyW3BoosterError } from '@w3booster/sdk';
+import { classifyW3BoosterError } from '@w3booster/sdk';
 import { w3boosterApp } from './w3booster.generated';
-import { settings } from './render';
+import { settings, syncedTitle } from './render';
 import { element } from './ui';
 
 const query = new URLSearchParams(location.search);
 document.body.dataset.application = w3boosterApp.clientId;
-// One repository, one app. Only Clean Overlay also renders an overlay surface.
+// One repository, one app.
 const view = query.get('view') || 'application';
 const theme = 'workbench';
-const presentation = { brand: 'SETTINGS PLAYGROUND', title: 'Change it. Preview it. Save it.', description: 'Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.' };
+const presentation = { brand: 'SETTINGS PLAYGROUND', title: 'One setting. Every surface.', description: 'Edit a title, save it through W3Booster, and watch the SDK-synced value drive this app and its transparent overlay.' };
 document.body.dataset.theme = theme;
 document.title = presentation.brand + ' · W3Booster Examples';
 // Direct visits start offline; registered W3Booster URLs explicitly select demo=0.
 const demo = query.get('demo') !== '0';
-const overlay = false;
+const overlay = view === 'overlay';
 document.body.classList.toggle('overlay', overlay);
 document.documentElement.classList.toggle('overlay-root', overlay);
 const root = document.querySelector<HTMLDivElement>('#app')!;
@@ -42,7 +42,6 @@ if (demo) {
   select.addEventListener('change', () => { const url = new URL(location.href); url.searchParams.set('scenario', select.value); location.assign(url); });
   label.append(select); controls.append(label);
 }
-const open = element('button', 'Open compact window'); open.disabled = true; controls.append(open);
 const feedback = element('p', '', 'notice'); feedback.setAttribute('role', 'status');
 const footer = element('footer');
 for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
@@ -57,7 +56,7 @@ const cachedRuntime = import.meta.hot?.data.runtime as ReturnType<typeof w3boost
 const runtime = cachedRuntime || w3boosterApp.createRuntime({ retry: true, ...(demoOptions ? { demo: demoOptions } : {}) });
 const uiLifetime = new AbortController();
 const signal = uiLifetime.signal;
-content.append(settings(runtime, demo, signal));
+content.append(overlay ? syncedTitle(runtime, signal) : settings(runtime, demo, signal));
 runtime.lifecycle.subscribe(snapshot => {
   status.textContent = snapshot.status === 'connected'
     ? (snapshot.isSynchronized ? (snapshot.state?.match.status === 'none' ? 'Connected · waiting for a match' : 'Connected · synchronized') : 'Connected · waiting for fresh data')
@@ -65,16 +64,7 @@ runtime.lifecycle.subscribe(snapshot => {
   document.body.dataset.connection = snapshot.status;
   document.body.dataset.synchronized = String(snapshot.isSynchronized);
 
-  open.disabled = !canUseHostCapability(snapshot.host, 'window:open');
-  open.title = open.disabled ? 'Open this app inside W3Booster to use host actions.' : '';
   details.textContent = JSON.stringify({ mode: demo ? 'demo' : 'live', status: snapshot.status, synchronized: snapshot.isSynchronized, match: snapshot.state?.match.status, dataCapabilities: snapshot.state?.capabilities || [], host: snapshot.host, definitionRevision: w3boosterApp.revision }, null, 2);
-}, { signal });
-open.addEventListener('click', async () => {
-  try {
-    const parameters = new URLSearchParams(location.search); parameters.set('view', 'compact');
-    await runtime.client.host.openWindow({ path: `?${parameters}`, width: 520, height: 620 }, { signal: runtime.signal, timeout: 10000 });
-  }
-  catch { feedback.textContent = 'The host could not open a window. Check Connection & capabilities.'; }
 }, { signal });
 runtime.client.on('issue', issue => { feedback.textContent = `A recoverable ${issue.source} issue occurred. See the browser console.`; console.warn(issue.source, issue.error); }, { signal });
 try { await runtime.start(); }

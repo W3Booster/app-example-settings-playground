@@ -17,15 +17,17 @@ try {
   assert.equal(await page.locator('body').getAttribute('data-theme'), config.theme);
   assert.equal(await page.locator('.repository-link').getAttribute('href'), config.repository);
   assert.equal(await page.locator('.badge').textContent(), 'DEMO DATA');
-  assert.equal(await page.getByRole('button', { name: 'Open compact window' }).isDisabled(), true);
+  assert.equal(await page.getByRole('button', { name: 'Open compact window' }).count(), 0);
   if (process.argv.includes('--screenshot')) {
     await page.evaluate(() => document.fonts.ready);
     await mkdir(new URL('../docs/', import.meta.url), { recursive: true });
     await page.screenshot({ path: new URL('../docs/screenshot.png', import.meta.url).pathname });
   }
   if (config.slug === 'settings-playground') {
+    const saved = await page.locator('.synced-title').textContent();
     await page.getByRole('textbox', { name: 'App title' }).fill('My tournament');
     assert.equal(await page.locator('.title-preview h3').textContent(), 'My tournament');
+    assert.equal(await page.locator('.synced-title').textContent(), saved, 'unsaved edits must not change SDK-synced output');
     assert.equal(await page.getByRole('button', { name: 'Save title' }).isDisabled(), true);
   }
   for (const scenario of ['no-match', 'missing-data', 'teams', 'finished']) {
@@ -41,7 +43,7 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile horizontal overflow');
   if (config.overlay) {
     await page.goto(base + '/?view=overlay&demo=1&capture=1');
-    await page.waitForSelector('.broadcast-strip');
+    await page.waitForSelector('.synced-title-output');
     assert.equal(await page.locator('header').isVisible(), false);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgba(0, 0, 0, 0)');
   }

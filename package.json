@@ -12,7 +12,7 @@
     "app:fork": "node scripts/fork.mjs",
     "build": "npm run check && vite build && node scripts/manifest.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
-    "test:browser": "node scripts/browser-test.mjs",
+    "test:browser": "node scripts/browser-test.mjs && node scripts/settings-sync-test.mjs",
     "screenshots": "npm run build && node scripts/browser-test.mjs --screenshot",
     "w3booster:sync": "w3booster-settings",
     "w3booster:check": "w3booster-settings --check"

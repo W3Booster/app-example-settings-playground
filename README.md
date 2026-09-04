@@ -2,7 +2,7 @@
 
 Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.
 
-[Try it now](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://github.com/W3Booster/app-examples)
+[Try it now](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
 
 ## Run locally
 
@@ -35,10 +35,16 @@ The checked-in binding belongs to the official Settings Playground app. Cloning 
 
 A direct visit defaults to demo mode. **Live URLs must include `demo=0`**. Live authorization failures never switch to demo data. A connected app waiting for a match is healthy. Host actions are disabled without authenticated host support; this is a browser app, not arbitrary filesystem or shell access.
 
-## Project map
+## Use the overlay
+
+This app also has stream and in-game surfaces. The app view is for inspection/configuration; `?view=overlay` is compact transparent output. In W3Booster, enable its Stream or In-game overlay. For local testing, use `http://localhost:5173/?view=overlay&demo=0`. OBS receives the W3Booster compositor URL, not an app launch URL.
+
+The unsaved preview reads the form draft. **SDK-synced output** reads only `runtime.lifecycle` resolved settings, and the overlay uses that same consumer. Save `display.title` in the app or change it in W3Booster’s settings: both live surfaces update from delivered state. An acknowledgement is not substituted for a delivered setting. Offline demo mode shows defaults, disables saving, and never claims to persist changes.
+
+## Source map
 
 - `src/render.ts`: this app’s feature code.
-- `src/main.ts`: SDK startup, diagnostics, host window action, and teardown/HMR.
+- `src/main.ts`: SDK startup, diagnostics and and teardown/HMR.
 - `src/scenarios.ts`: synthetic offline fixtures, lazy-loaded only in demo mode.
 - `src/w3booster.generated.ts`: generated identity and typed settings; do not edit by hand.
 - `scripts/browser-test.mjs`: real-browser scenario, responsive, and authorization-error checks.
@@ -59,6 +65,6 @@ Deploy `dist/` to an HTTPS static host. The included GitHub Actions workflow che
 
 The build emits `example-bindings.json` from the binding actually compiled into the app. Official catalog reapply checks each deployed app independently. No database or user credentials belong in this repository or Pages secrets.
 
-For a complete Angular product, [start from Match Vision](https://github.com/W3Booster/app-match-vision/blob/main/docs/START_FROM_MATCH_VISION.md). For other focused apps, see the [example directory](https://github.com/W3Booster/app-examples).
+For a complete Angular product, [start from Match Vision](https://github.com/W3Booster/app-match-vision/blob/main/docs/START_FROM_MATCH_VISION.md). For other focused apps, see the [example directory](https://website.w3booster.com/developer/examples/).
 
 MIT licensed; retain [LICENSE](LICENSE) when reusing source. No Warcraft artwork is bundled.

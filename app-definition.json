@@ -2,7 +2,9 @@
   "name": "Settings Playground",
   "description": "Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.",
   "surfaces": [
-    "application"
+    "application",
+    "streamOverlay",
+    "ingameOverlay"
   ],
   "applicationUrl": "http://localhost:5173/?demo=0",
   "scopes": [
@@ -35,5 +37,7 @@
         ]
       }
     ]
-  }
+  },
+  "streamOverlayUrl": "http://localhost:5173/?view=overlay&demo=0",
+  "ingameOverlayUrl": "http://localhost:5173/?view=overlay&demo=0"
 }
