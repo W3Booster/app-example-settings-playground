@@ -82,3 +82,7 @@ After editing your registered contract, run `npm run w3booster:sync`; `npm run w
 For a complete Angular starting point, [build from Match Vision](https://website.w3booster.com/developer/match-vision/). All examples remain together in the [example library](https://website.w3booster.com/developer/examples/).
 
 MIT licensed; retain [LICENSE](LICENSE) when reusing source. No Warcraft artwork is bundled.
+
+## Shared game context
+
+This example uses SDK 1.1.0. Shared HUD scale, chat-input visibility, and team-color mode are available through `gameContext(state)` from `@w3booster/sdk/selectors`, without an additional scope. Request only the match/player data this app consumes. App-specific values belong in `state.application.data`; Match Vision’s score is not shared game context.
