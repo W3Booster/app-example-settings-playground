@@ -1,3 +1,4 @@
+import './shell.css';
 import './controller.css';
 import { classifyW3BoosterError } from '@w3booster/sdk';
 import { w3boosterApp } from './w3booster.generated';
@@ -9,7 +10,7 @@ document.body.dataset.application = w3boosterApp.clientId;
 // One repository, one app.
 const view = query.get('view') || 'application';
 const theme = 'workbench';
-const presentation = { brand: 'BROADCAST CONTROLLER', title: 'Prepare privately. Publish deliberately.', description: 'An operator app and a stream-only lower third. Save a broadcast title, then show or hide the saved output without exposing your unsaved draft.' };
+const presentation = { brand: 'BROADCAST CONTROLLER', title: 'Broadcast title', description: 'Edit the title and control what appears on stream.' };
 document.body.dataset.theme = theme;
 document.title = presentation.brand + ' · W3Booster Examples';
 // Direct visits start offline; registered W3Booster URLs explicitly select demo=0.
@@ -26,7 +27,7 @@ const repository = element('a', 'Public repository ↗', 'repository-link'); rep
 const badge = element('span', demo ? 'DEMO DATA' : 'LIVE CONNECTION', 'badge'); headerActions.append(badge, repository); header.append(headerActions);
 const intro = element('div', '', 'intro');
 const appTitle = element('h1', presentation.title);
-intro.append(element('p', 'W3BOOSTER / OPEN-SOURCE EXAMPLE APP', 'eyebrow'), appTitle);
+intro.append(appTitle);
 intro.append(element('p', presentation.description));
 const status = element('p', 'Starting…', 'notice'); status.setAttribute('role', 'status');
 const content = element('div', '', 'content');
@@ -44,10 +45,9 @@ if (demo) {
 }
 const feedback = element('p', '', 'notice'); feedback.setAttribute('role', 'status');
 const footer = element('footer');
-for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
+for (const [text, href] of [['Setup guide', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
   const link = element('a', text); link.href = href; footer.append(link);
 }
-const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-settings-playground/blob/main/src/controller.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
 shell.append(header, intro);
 shell.append(controls, status, content, feedback, diagnostic, footer); root.replaceChildren(shell);
 // Explicit synthetic on-air state, not a simulated save. Live defaults are off air.

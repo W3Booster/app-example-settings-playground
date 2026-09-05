@@ -25,6 +25,8 @@ try {
   const base = 'http://127.0.0.1:' + server.httpServer.address().port;
   const open = async query => { await page.goto(base + '/?' + query); await page.waitForSelector('body[data-synchronized="true"]'); };
   await open('capture=1');
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(11, 13, 16)');
+  assert.ok(await page.locator('h1').evaluate(el => parseFloat(getComputedStyle(el).fontSize) <= 24));
   assert.equal(await page.locator('body').getAttribute('data-application'), manifest.examples[0].clientId);
   assert.equal(await page.locator('.repository-link').getAttribute('href'), config.repository);
   assert.equal(await page.locator('.badge').textContent(), 'DEMO DATA');
@@ -87,6 +89,17 @@ try {
       const outside = await page.screenshot({ clip: { x: 1000, y: 500, width: 1, height: 1 } });
       assert.deepEqual(inside, outside, 'opaque iframe canvas under ' + scheme + ' host');
     }
+  }
+  // Check the actual iframe canvas, not only CSS background declarations.
+  for (const scheme of ['normal', 'dark']) {
+    const probe = await context.newPage();
+    await probe.setViewportSize({ width: 1440, height: 960 });
+    await probe.setContent('<html style="color-scheme:' + scheme + '"><body style="margin:0;background:rgb(83,41,113)"><iframe style="border:0;width:960px;height:700px;color-scheme:normal" src="' + base + '/?view=overlay&demo=1&capture=1"></iframe></body></html>');
+    await probe.frameLocator('iframe').locator('body[data-synchronized="true"]').waitFor();
+    const inside = await probe.screenshot({ clip: { x: 780, y: 600, width: 1, height: 1 } });
+    const outside = await probe.screenshot({ clip: { x: 1100, y: 600, width: 1, height: 1 } });
+    assert.deepEqual(inside, outside, 'empty overlay canvas must stay transparent under ' + scheme);
+    await probe.close();
   }
   await page.goto(base + '/?demo=0');
   await page.waitForFunction(() => document.body.innerText.includes('Opening localhost directly does not authorize') || document.body.innerText.includes('Could not start'), { timeout: 20000 });

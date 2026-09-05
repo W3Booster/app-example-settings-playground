@@ -1,6 +1,6 @@
 # Broadcast Controller
 
-A focused W3Booster example by **W3Pad**. Prepare a broadcast title in a private operator window, then show the saved lower third to viewers. This uses an **application plus stream overlay**. There is deliberately no in-game overlay: the title is for the audience, not the player.
+A focused W3Booster example. Prepare a broadcast title in a private operator window, then show the saved lower third to viewers. This uses an **application plus stream overlay**. There is deliberately no in-game overlay: the title is for the audience, not the player.
 
 [Try the demo](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
 
@@ -30,6 +30,8 @@ Open **http://localhost:5173/**. Expect **DEMO DATA** and **Connected · synchro
 The program reads resolved SDK settings, never the draft or a substituted acknowledgement. It starts **off air in live use**. The demo explicitly supplies a synthetic on-air fixture so output can be inspected, offers an off-air scenario, and disables persistence controls. It does not simulate successful saves.
 
 Private drafts survive incoming settings updates and save acknowledgements. A newer typed draft is never replaced by an older save. While disconnected or not synchronized, output is hidden and host actions are disabled.
+
+The interface uses W3Booster-style dark surfaces, compact controls and a distinct accent. `src/shell.css` contains the small, standalone shell; the feature stylesheet contains only this app’s layout. Headings describe the task, not a marketing message.
 
 ## Surfaces and minimum permissions
 

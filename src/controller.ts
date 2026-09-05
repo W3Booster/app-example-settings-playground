@@ -24,17 +24,17 @@ export function syncedTitle(runtime: Runtime, signal: AbortSignal) {
 export function settings(runtime: Runtime, demo: boolean, signal: AbortSignal) {
   const view = element('section', '', 'controller');
   const form = element('form', '', 'operator-panel');
-  form.append(element('span', 'OPERATOR / NOT SHOWN ON STREAM', 'eyebrow'), element('h2', 'Prepare the next title.'));
+  form.append(element('p', 'PRIVATE CONTROLS', 'eyebrow'));
   const label = element('label', 'Broadcast title');
   const input = element('input'); input.name = 'title'; input.maxLength = 80;
   input.value = runtime.lifecycle.get().settings.display.title; label.append(input);
   const save = element('button', 'Save title'); save.type = 'submit';
-  const feedback = element('p', demo ? 'Demo: preview a draft here. Saving and on-air controls require W3Booster.' : 'Save a title, then put the saved output on air.', 'notice'); feedback.setAttribute('role', 'status');
+  const feedback = element('p', demo ? 'Demo preview. Open in W3Booster to save changes.' : '', 'notice'); feedback.setAttribute('role', 'status');
   const draft = element('div', '', 'title-preview');
   const draftTitle = element('h3', input.value); draft.append(element('span', 'DRAFT / NOT ON AIR', 'eyebrow'), draftTitle);
   let dirty = false, saving = false;
   let pendingTitle: string | null = null;
-  input.addEventListener('input', () => { dirty = true; draftTitle.textContent = input.value || 'Untitled broadcast'; feedback.textContent = 'Unsaved draft. The stream still uses the delivered saved title.'; }, { signal });
+  input.addEventListener('input', () => { dirty = true; draftTitle.textContent = input.value || 'Untitled broadcast'; feedback.textContent = demo ? 'Demo draft. Open in W3Booster to save.' : 'Unsaved changes.'; }, { signal });
   const program = element('div', '', 'program-panel');
   const stateLabel = element('strong', '', 'program-state');
   const stage = element('div', '', 'program-stage');
@@ -49,7 +49,7 @@ export function settings(runtime: Runtime, demo: boolean, signal: AbortSignal) {
     try {
       if (path === 'display.title') await runtime.client.host.setSetting(path, String(value), { timeout: 5000, signal });
       else await runtime.client.host.setSetting(path, value === true, { timeout: 5000, signal });
-      feedback.textContent = 'Host acknowledged the change. Program output follows SDK delivery, not this acknowledgement.';
+      feedback.textContent = 'Change accepted. Check the stream preview.';
     } catch { if (path === 'display.title') pendingTitle = null; feedback.textContent = 'Change was not confirmed. Check the connection and saved output before retrying.'; }
     finally { saving = false; updateControls(); }
   }
@@ -63,10 +63,10 @@ export function settings(runtime: Runtime, demo: boolean, signal: AbortSignal) {
   take.addEventListener('click', () => { void action('display.onAir', !runtime.lifecycle.get().settings.display.onAir); }, { signal });
   runtime.lifecycle.subscribe(snapshot => {
     const onAir = snapshot.settings.display.onAir;
-    stateLabel.textContent = !snapshot.isSynchronized ? 'NOT FRESH / OUTPUT HIDDEN' : onAir ? 'ON AIR · SAVED OUTPUT' : 'OFF AIR';
+    stateLabel.textContent = !snapshot.isSynchronized ? 'DISCONNECTED · OUTPUT HIDDEN' : onAir ? 'ON AIR' : 'OFF AIR';
     stateLabel.dataset.onAir = String(onAir && snapshot.isSynchronized);
     offAir.hidden = onAir && snapshot.isSynchronized;
-    offAir.textContent = snapshot.isSynchronized ? 'The stream output is transparent while off air.' : 'Waiting for fresh settings. Stale output is hidden.';
+    offAir.textContent = snapshot.isSynchronized ? 'Title hidden on stream.' : 'Waiting for current settings.';
     take.textContent = onAir ? 'Take title off air' : 'Show saved title on stream';
     if (pendingTitle !== null && snapshot.settings.display.title === pendingTitle) {
       dirty = input.value !== pendingTitle;
@@ -76,6 +76,6 @@ export function settings(runtime: Runtime, demo: boolean, signal: AbortSignal) {
     updateControls();
   }, { signal });
   form.append(label, save, feedback, draft);
-  program.append(stateLabel, stage, take, element('p', 'Enable this app’s Stream overlay in W3Booster. For OBS, copy your W3Booster URL from Set up OBS. The controller is private; only the lower third reaches viewers. There is deliberately no in-game overlay.'));
+  program.append(stateLabel, stage, take, element('p', 'Enable Stream overlay in W3Booster. For OBS, use Set up OBS.'));
   view.append(form, program); return view;
 }
