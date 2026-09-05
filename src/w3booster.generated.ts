@@ -1,6 +1,6 @@
 /* Generated from the W3Booster application database. Do not edit directly. */
 // @w3booster-client-id app_d3091e0d2c64c7bb03231375
-// @w3booster-revision 6ee1abfb4015f8a670b31d6d16a05f1cc43f6712c88bd6fa43514ae5c76122e9
+// @w3booster-revision 63f09f34a2c99e18da38fb2fbfa10dce58d35db175dfc3e0eaa58dcbd338adfa
 
 import type { W3BoosterClient } from '@w3booster/sdk';
 import { defineApplication, type ApplicationConnectOptions, type ApplicationRuntime, type ApplicationRuntimeSnapshot } from '@w3booster/sdk/app';
@@ -9,6 +9,7 @@ import type { DeepPartial } from '@w3booster/sdk/settings';
 export interface W3BoosterAppSettings {
   display: {
     title: string;
+    onAir: boolean;
   };
 }
 export type W3BoosterAppDeliveredSettings = DeepPartial<W3BoosterAppSettings>;
@@ -17,11 +18,12 @@ export type W3BoosterAppRuntime<TOverlayExtensions extends object = object> = Ap
 export type W3BoosterAppRuntimeSnapshot<TOverlayExtensions extends object = object> = ApplicationRuntimeSnapshot<W3BoosterAppSettings, TOverlayExtensions>;
 const w3boosterAppDefinition = {
   clientId: "app_d3091e0d2c64c7bb03231375",
-  revision: "6ee1abfb4015f8a670b31d6d16a05f1cc43f6712c88bd6fa43514ae5c76122e9",
-  scopes: ["match:read","players:read","resources:read","heroes:read","overlay:read"],
+  revision: "63f09f34a2c99e18da38fb2fbfa10dce58d35db175dfc3e0eaa58dcbd338adfa",
+  scopes: ["match:read"],
   settingsDefaults: {
     "display": {
-      "title": "My first W3Booster app"
+      "title": "Community Cup · Round 1",
+      "onAir": false
     }
   }
 } as const;

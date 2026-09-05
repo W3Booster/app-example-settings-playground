@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Settings Playground — a standalone W3Booster TypeScript example",
+  "description": "Broadcast Controller — a focused W3Booster workflow example",
   "license": "MIT",
   "repository": "https://github.com/W3Booster/app-example-settings-playground",
   "scripts": {
@@ -33,5 +33,6 @@
     "clientId": "app_d3091e0d2c64c7bb03231375",
     "settingsOutput": "src/w3booster.generated.ts",
     "endpoint": "https://api.w3booster.com"
-  }
+  },
+  "author": "W3Pad"
 }

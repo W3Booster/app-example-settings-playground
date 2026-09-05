@@ -4,53 +4,85 @@ import { chromium } from 'playwright';
 import { preview } from 'vite';
 
 const config = JSON.parse(await readFile(new URL('../example.json', import.meta.url), 'utf8'));
+const definition = JSON.parse(await readFile(new URL('../app-definition.json', import.meta.url), 'utf8'));
 const manifest = JSON.parse(await readFile(new URL('../dist/example-bindings.json', import.meta.url), 'utf8'));
+const expected = {
+  'match-dashboard': { surfaces: ['application'], scopes: ['match:read', 'players:read'] },
+  'resource-monitor': { surfaces: ['streamOverlay', 'ingameOverlay'], scopes: ['match:read', 'players:read', 'resources:read'] },
+  'settings-playground': { surfaces: ['application', 'streamOverlay'], scopes: ['match:read'] },
+  'clean-overlay': { surfaces: ['streamOverlay', 'ingameOverlay'], scopes: ['match:read', 'players:read'] }
+}[config.slug];
+assert.deepEqual(config.surfaces, expected.surfaces);
+assert.deepEqual(definition.surfaces, expected.surfaces);
+assert.deepEqual(definition.scopes, expected.scopes);
+assert.deepEqual(manifest.examples[0].surfaces, expected.surfaces);
 const server = await preview({ preview: { host: '127.0.0.1', port: 0, strictPort: false } });
 const browser = await chromium.launch();
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
+  const page = await context.newPage();
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   const base = 'http://127.0.0.1:' + server.httpServer.address().port;
-  await page.goto(base + '/?capture=1');
-  await page.waitForSelector('body[data-synchronized="true"]');
+  const open = async query => { await page.goto(base + '/?' + query); await page.waitForSelector('body[data-synchronized="true"]'); };
+  await open('capture=1');
   assert.equal(await page.locator('body').getAttribute('data-application'), manifest.examples[0].clientId);
-  assert.equal(await page.locator('body').getAttribute('data-theme'), config.theme);
   assert.equal(await page.locator('.repository-link').getAttribute('href'), config.repository);
   assert.equal(await page.locator('.badge').textContent(), 'DEMO DATA');
   assert.equal(await page.getByRole('button', { name: 'Open compact window' }).count(), 0);
+  if (config.slug === 'match-dashboard') {
+    await page.getByRole('button', { name: 'Keep match snapshot' }).click();
+    await page.getByRole('textbox', { name: 'Private match notes', exact: true }).fill('Opening: scout before expanding.\nPractice: spend gold before the next fight.');
+    await page.reload(); await page.waitForSelector('body[data-synchronized="true"]');
+    assert.match(await page.getByRole('textbox', { name: 'Private match notes', exact: true }).inputValue(), /scout before expanding/);
+    await page.getByRole('button', { name: 'Keep match snapshot' }).click();
+    assert.match(await page.getByRole('textbox', { name: 'Private match notes', exact: true }).inputValue(), /scout before expanding/);
+    assert.equal(await page.locator('.notebook-entry').count(), 1, 'updating a snapshot preserves the note without duplicates');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByRole('button', { name: 'Copy match summary + notes' }).click();
+    assert.match(await page.evaluate(() => navigator.clipboard.readText()), /scout before expanding/);
+  }
+  if (config.slug === 'settings-playground') {
+    const saved = await page.locator('.synced-title').textContent();
+    await page.getByRole('textbox', { name: 'Broadcast title' }).fill('Next: the grand final');
+    assert.equal(await page.locator('.title-preview h3').textContent(), 'Next: the grand final');
+    assert.equal(await page.locator('.synced-title').textContent(), saved);
+    assert.equal(await page.getByRole('button', { name: 'Save title' }).isDisabled(), true);
+    assert.equal(await page.getByRole('button', { name: 'Take title off air' }).isDisabled(), true);
+  }
   if (process.argv.includes('--screenshot')) {
     await page.evaluate(() => document.fonts.ready);
     await mkdir(new URL('../docs/', import.meta.url), { recursive: true });
     await page.screenshot({ path: new URL('../docs/screenshot.png', import.meta.url).pathname });
   }
-  if (config.slug === 'settings-playground') {
-    const saved = await page.locator('.synced-title').textContent();
-    await page.getByRole('textbox', { name: 'App title' }).fill('My tournament');
-    assert.equal(await page.locator('.title-preview h3').textContent(), 'My tournament');
-    assert.equal(await page.locator('.synced-title').textContent(), saved, 'unsaved edits must not change SDK-synced output');
-    assert.equal(await page.getByRole('button', { name: 'Save title' }).isDisabled(), true);
-  }
   for (const scenario of ['no-match', 'missing-data', 'teams', 'finished']) {
-    await page.goto(base + '/?scenario=' + scenario + '&capture=1');
-    await page.waitForSelector('body[data-synchronized="true"]');
+    await open('scenario=' + scenario + '&capture=1');
     assert.ok((await page.locator('.content').textContent()).trim());
-    if (scenario === 'no-match') assert.match(await page.locator('.shell > [role=status]').first().textContent(), /waiting for a match/);
-    if (scenario === 'missing-data' && config.slug === 'resource-monitor') assert.match(await page.locator('.content').textContent(), /unavailable/i);
+    if (scenario === 'no-match' && config.slug === 'match-dashboard') assert.equal(await page.getByRole('button', { name: 'Keep match snapshot' }).isDisabled(), true);
+    if (scenario === 'missing-data' && config.slug === 'resource-monitor') {
+      assert.match(await page.locator('.content').textContent(), /Resource data unavailable/);
+      assert.equal(await page.locator('.resource-value.gold strong').first().textContent(), '—');
+    }
+    if (scenario === 'teams' && ['resource-monitor', 'clean-overlay'].includes(config.slug)) assert.equal(await page.locator(config.slug === 'resource-monitor' ? '.resource-card' : '.broadcast-player').count(), 4);
   }
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(base + '/?capture=1');
-  await page.waitForSelector('body[data-synchronized="true"]');
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile horizontal overflow');
-  if (config.overlay) {
-    await page.goto(base + '/?view=overlay&demo=1&capture=1');
-    await page.waitForSelector('.synced-title-output');
+  await page.setViewportSize({ width: 390, height: 844 }); await open('capture=1');
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile overflow');
+  if (config.surfaces.includes('streamOverlay')) {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await open('view=overlay&demo=1&capture=1');
     assert.equal(await page.locator('header').isVisible(), false);
     assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgba(0, 0, 0, 0)');
+    const target = config.slug === 'resource-monitor' ? '.resource-card' : config.slug === 'clean-overlay' ? '.broadcast-strip' : '.synced-title-output';
+    assert.equal(await page.locator(target).first().isVisible(), true);
+    await page.evaluate(() => document.body.dataset.synchronized = 'false');
+    assert.equal(await page.locator(target).first().isVisible(), false, 'stale overlay must not look live');
+    await open('view=overlay&demo=1&capture=1&scenario=' + (config.slug === 'settings-playground' ? 'off-air' : 'no-match'));
+    assert.equal(await page.locator(target).first().isVisible(), false, 'inactive output must be hidden');
   }
   await page.goto(base + '/?demo=0');
   await page.waitForFunction(() => document.body.innerText.includes('Opening localhost directly does not authorize') || document.body.innerText.includes('Could not start'), { timeout: 20000 });
   assert.equal(await page.locator('.badge').textContent(), 'LIVE CONNECTION');
   assert.notEqual(await page.locator('body').getAttribute('data-synchronized'), 'true');
+  if (config.slug === 'match-dashboard') assert.equal(await page.locator('.notebook-entry').count(), 0, 'demo notes must not enter live notebook');
   assert.deepEqual(errors, []);
-  console.log(config.slug + ': demo, scenarios, source link, mobile, host gating, and unauthorized live launch passed.');
+  console.log(config.slug + ': workflow, minimal scopes, surfaces, inactive/stale output, persistence, and authorization checks passed.');
 } finally { await browser.close(); await new Promise(resolve => server.httpServer.close(resolve)); }

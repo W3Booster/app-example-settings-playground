@@ -1,12 +1,14 @@
-# Settings Playground
+# Broadcast Controller
 
-Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.
+A focused W3Booster example by **W3Pad**. Prepare a broadcast title in a private operator window, then show the saved lower third to viewers. This uses an **application plus stream overlay**. There is deliberately no in-game overlay: the title is for the audience, not the player.
 
-[Try it now](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
+[Try the demo](https://w3booster.github.io/app-example-settings-playground/) · [Developer docs](https://website.w3booster.com/developer/) · [All examples](https://website.w3booster.com/developer/examples/)
 
-## Run locally
+The repository URL remains `app-example-settings-playground` so existing links and installations survive the workflow redesign.
 
-Node.js 22.22.3 or newer. No account, Warcraft III, desktop client, or database needed for demo mode.
+## Run in one minute
+
+Node.js 22.22.3 or newer. Demo mode needs no account, Warcraft III, desktop client, or database.
 
 ```sh
 git clone https://github.com/W3Booster/app-example-settings-playground.git
@@ -15,41 +17,46 @@ npm ci
 npm run dev
 ```
 
-Open **http://localhost:5173/**. Look for **DEMO DATA** and **Connected · synchronized**. Type into App title to change the preview; saving intentionally needs a live host.
+Open **http://localhost:5173/**. Expect **DEMO DATA** and **Connected · synchronized**. Edit **[src/controller.ts](src/controller.ts)** and watch the UI reload. Startup and teardown are in **[src/main.ts](src/main.ts)**; appearance is in **[src/controller.css](src/controller.css)**.
 
-## Make it yours
+## Try the actual workflow
 
-Edit **[src/render.ts](src/render.ts)** for the interface and **[src/style.css](src/style.css)** for its appearance. Change the heading in **[src/main.ts](src/main.ts)**. There is no app selector, shared-repository router, or second project to install.
+1. In W3Booster, open the controller and enable its Stream overlay.
+2. Type a broadcast title. Only the draft preview changes.
+3. **Save title** persists `display.title` through the authenticated host.
+4. **Show saved title on stream** persists `display.onAir`; **Take title off air** hides it again.
+5. Change either field in W3Booster's app settings: both real SDK consumers receive it.
 
-The checked-in binding belongs to the official Settings Playground app. Cloning it does **not** give you ownership or authorize live data. Before launching your own fork, register a new app and replace this binding.
+The program reads resolved SDK settings, never the draft or a substituted acknowledgement. It starts **off air in live use**. The demo explicitly supplies a synthetic on-air fixture so output can be inspected, offers an off-air scenario, and disables persistence controls. It does not simulate successful saves.
 
-1. Enable Developer Mode in W3Booster, then open **Apps → Developer → Create app**.
-2. Use [app-definition.json](app-definition.json) as a configuration guide. Choose your own name and URLs; copy the scopes and settings schema required by this interface.
-3. Bind your new public client ID:
+Private drafts survive incoming settings updates and save acknowledgements. A newer typed draft is never replaced by an older save. While disconnected or not synchronized, output is hidden and host actions are disabled.
+
+## Surfaces and minimum permissions
+
+Register **Application** at `http://localhost:5173/?demo=0` and **Stream overlay** at `http://localhost:5173/?view=overlay&demo=0`. Leave In-game overlay unconfigured. Copy the two-field schema from `app-definition.json`; the stream and operator use the same app identity and separate SDK runtimes.
+
+Data scopes: `match:read` (the lower-third game clock); settings writes use the discovered `settings:write` host capability. There are no unrelated data permissions. The app-definition file is the registration guide; `example.json` and the tested build manifest declare the same surfaces.
+
+In W3Booster, turn on the configured **Stream** or **In-game** surface. For OBS, copy your W3Booster URL from **Set up OBS** and add it as a browser source. This one source displays all your enabled stream overlays; never paste a user launch URL into OBS.
+
+## Fork and use live data
+
+The checked-in binding identifies the official example. Cloning source does **not** grant ownership or live access.
+
+1. Enable Developer Mode in W3Booster and create your own application.
+2. Use [app-definition.json](app-definition.json) for the exact surfaces, scopes, and settings schema. Supply your own name and hosted URLs.
+3. Replace the official binding safely:
 
    ```sh
    npm run app:fork -- YOUR_NEW_CLIENT_ID
+   npm run check
    ```
 
-4. Commit the generated binding and package.json. Use **Test locally** with `http://localhost:5173/?demo=0`, then launch through W3Booster.
+4. Use **Test locally** with the configured surface URLs above, then launch through W3Booster. Commit the new binding and package configuration.
 
-A direct visit defaults to demo mode. **Live URLs must include `demo=0`**. Live authorization failures never switch to demo data. A connected app waiting for a match is healthy. Host actions are disabled without authenticated host support; this is a browser app, not arbitrary filesystem or shell access.
+Direct visits default to offline demo data. Registered live URLs must include `demo=0`. Failed authorization never silently falls back to synthetic data. The application runs with browser APIs and the SDK; it has no arbitrary shell or filesystem access.
 
-## Use the overlay
-
-This app also has stream and in-game surfaces. The app view is for inspection/configuration; `?view=overlay` is compact transparent output. In W3Booster, enable its Stream or In-game overlay. For local testing, use `http://localhost:5173/?view=overlay&demo=0`. OBS receives the W3Booster compositor URL, not an app launch URL.
-
-The unsaved preview reads the form draft. **SDK-synced output** reads only `runtime.lifecycle` resolved settings, and the overlay uses that same consumer. Save `display.title` in the app or change it in W3Booster’s settings: both live surfaces update from delivered state. An acknowledgement is not substituted for a delivered setting. Offline demo mode shows defaults, disables saving, and never claims to persist changes.
-
-## Source map
-
-- `src/render.ts`: this app’s feature code.
-- `src/main.ts`: SDK startup, diagnostics and and teardown/HMR.
-- `src/scenarios.ts`: synthetic offline fixtures, lazy-loaded only in demo mode.
-- `src/w3booster.generated.ts`: generated identity and typed settings; do not edit by hand.
-- `scripts/browser-test.mjs`: real-browser scenario, responsive, and authorization-error checks.
-
-## Check and publish
+## Verify and publish
 
 ```sh
 npm run check
@@ -59,12 +66,14 @@ npm run test:browser
 npm run screenshots
 ```
 
-The screenshot command captures the real interface to `docs/screenshot.png`. ![Actual app screenshot](docs/screenshot.png)
+Tests exercise the real workflow, minimal scopes, configured surfaces, mobile layout, demo/live isolation, and authorization failures; a second test delivers settings to two real SDK runtimes and verifies drafts, on/off-air output, and teardown. Screenshots capture the real UI, not a mockup.
 
-Deploy `dist/` to an HTTPS static host. The included GitHub Actions workflow checks the app and deploys GitHub Pages; enable **Settings → Pages → GitHub Actions** in your repository. Set your own registered URLs to that origin with `?demo=0`. Builds use the checked-in registry lockfile and never fetch the platform definition automatically. After changing your registered contract, run `npm run w3booster:sync`; `npm run w3booster:check` is an explicit connected check.
+![Broadcast Controller: actual runnable interface](docs/screenshot.png)
 
-The build emits `example-bindings.json` from the binding actually compiled into the app. Official catalog reapply checks each deployed app independently. No database or user credentials belong in this repository or Pages secrets.
+The included GitHub Actions workflow checks the project and deploys `dist/` to Pages. Enable **Settings → Pages → GitHub Actions** in your fork and replace the official URLs. The build uses the checked-in SDK lockfile and does not fetch private data. Its `example-bindings.json` records the binding actually compiled and the tested supported surfaces.
 
-For a complete Angular product, [start from Match Vision](https://github.com/W3Booster/app-match-vision/blob/main/docs/START_FROM_MATCH_VISION.md). For other focused apps, see the [example directory](https://website.w3booster.com/developer/examples/).
+After editing your registered contract, run `npm run w3booster:sync`; `npm run w3booster:check` verifies the current public definition. Never put credentials or real user captures into the repository or Pages secrets.
+
+For a complete Angular starting point, [build from Match Vision](https://website.w3booster.com/developer/match-vision/). All examples remain together in the [example library](https://website.w3booster.com/developer/examples/).
 
 MIT licensed; retain [LICENSE](LICENSE) when reusing source. No Warcraft artwork is bundled.

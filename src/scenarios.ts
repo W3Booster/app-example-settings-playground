@@ -1,6 +1,6 @@
 import { createDemoState } from '@w3booster/sdk/testing';
 
-export const scenarios = ['match', 'no-match', 'missing-data', 'teams', 'finished'] as const;
+export const scenarios = ['match', 'off-air', 'no-match', 'finished'] as const;
 export function scenarioState(name: string) {
   const fixture = createDemoState();
   const state = { ...fixture, match: { ...fixture.match, gameTime: 872 } };

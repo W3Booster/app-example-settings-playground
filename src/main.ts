@@ -1,7 +1,7 @@
-import './style.css';
+import './controller.css';
 import { classifyW3BoosterError } from '@w3booster/sdk';
 import { w3boosterApp } from './w3booster.generated';
-import { settings, syncedTitle } from './render';
+import { settings, syncedTitle } from './controller';
 import { element } from './ui';
 
 const query = new URLSearchParams(location.search);
@@ -9,7 +9,7 @@ document.body.dataset.application = w3boosterApp.clientId;
 // One repository, one app.
 const view = query.get('view') || 'application';
 const theme = 'workbench';
-const presentation = { brand: 'SETTINGS PLAYGROUND', title: 'One setting. Every surface.', description: 'Edit a title, save it through W3Booster, and watch the SDK-synced value drive this app and its transparent overlay.' };
+const presentation = { brand: 'BROADCAST CONTROLLER', title: 'Prepare privately. Publish deliberately.', description: 'An operator app and a stream-only lower third. Save a broadcast title, then show or hide the saved output without exposing your unsaved draft.' };
 document.body.dataset.theme = theme;
 document.title = presentation.brand + ' · W3Booster Examples';
 // Direct visits start offline; registered W3Booster URLs explicitly select demo=0.
@@ -47,10 +47,11 @@ const footer = element('footer');
 for (const [text, href] of [['Build your own', 'https://website.w3booster.com/developer/first-app/'], ['View source', 'https://github.com/W3Booster/app-example-settings-playground'], ['SDK reference', 'https://website.w3booster.com/developer/api/']]) {
   const link = element('a', text); link.href = href; footer.append(link);
 }
-const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-settings-playground/blob/main/src/render.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
+const sourceLink = element('a', 'Read this example’s code ↗', 'source-link'); sourceLink.href = 'https://github.com/W3Booster/app-example-settings-playground/blob/main/src/controller.ts'; sourceLink.target = '_blank'; sourceLink.rel = 'noopener noreferrer'; controls.append(sourceLink);
 shell.append(header, intro);
 shell.append(controls, status, content, feedback, diagnostic, footer); root.replaceChildren(shell);
-const demoOptions = demo ? { state: (await import('./scenarios')).scenarioState(query.get('scenario') || 'match'), interval: query.get('capture') === '1' || ['no-match', 'finished'].includes(query.get('scenario') || '') ? 0 : 1000 } : undefined;
+// Explicit synthetic on-air state, not a simulated save. Live defaults are off air.
+const demoOptions = demo ? { settings: { display: { title: 'Community Cup · Round 1', onAir: query.get('scenario') !== 'off-air' } }, state: (await import('./scenarios')).scenarioState(query.get('scenario') || 'match'), interval: query.get('capture') === '1' || ['no-match', 'finished'].includes(query.get('scenario') || '') ? 0 : 1000 } : undefined;
 // Preserve the authorized connection across UI hot updates; dispose only the old UI.
 const cachedRuntime = import.meta.hot?.data.runtime as ReturnType<typeof w3boosterApp.createRuntime> | undefined;
 const runtime = cachedRuntime || w3boosterApp.createRuntime({ retry: true, ...(demoOptions ? { demo: demoOptions } : {}) });

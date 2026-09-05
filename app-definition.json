@@ -1,43 +1,46 @@
 {
-  "name": "Settings Playground",
-  "description": "Learn generated settings and authenticated host actions. Change the app title, persist it through W3Booster, and observe updates across app windows.",
+  "name": "Broadcast Controller",
+  "description": "Prepare a broadcast title privately, save it, then show or hide the SDK-synced lower third on stream. An operator app plus stream output, without an in-game overlay.",
   "surfaces": [
     "application",
-    "streamOverlay",
-    "ingameOverlay"
+    "streamOverlay"
   ],
-  "applicationUrl": "http://localhost:5173/?demo=0",
   "scopes": [
-    "match:read",
-    "players:read",
-    "resources:read",
-    "heroes:read",
-    "overlay:read"
+    "match:read"
   ],
   "settingsSchema": {
     "version": 1,
     "sections": [
       {
         "id": "display",
-        "title": "Display",
+        "title": "Broadcast",
+        "description": "",
         "groups": [
           {
             "id": "appearance",
-            "title": "Appearance"
+            "title": "On-air output",
+            "description": ""
           }
         ],
         "fields": [
           {
             "key": "display.title",
-            "label": "App title",
+            "label": "Broadcast title",
             "type": "text",
             "group": "appearance",
-            "default": "My first W3Booster app"
+            "default": "Community Cup · Round 1"
+          },
+          {
+            "key": "display.onAir",
+            "label": "Show title on stream",
+            "type": "boolean",
+            "group": "appearance",
+            "default": false
           }
         ]
       }
     ]
   },
-  "streamOverlayUrl": "http://localhost:5173/?view=overlay&demo=0",
-  "ingameOverlayUrl": "http://localhost:5173/?view=overlay&demo=0"
+  "applicationUrl": "http://localhost:5173/?demo=0",
+  "streamOverlayUrl": "http://localhost:5173/?view=overlay&demo=0"
 }

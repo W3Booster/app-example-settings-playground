@@ -14,4 +14,4 @@ const config = JSON.parse(await readFile(new URL('../example.json', import.meta.
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 if (pkg.w3booster && pkg.w3booster.clientId !== values.clientId[0]) throw new Error('package.json and generated binding disagree. Run w3booster-settings init for your app.');
 await mkdir(new URL('../dist/', import.meta.url), { recursive: true });
-await writeFile(new URL('../dist/example-bindings.json', import.meta.url), JSON.stringify({ examples: [{ slug: config.slug, clientId: values.clientId[0], revision: values.revision[0], surfaces: config.overlay ? ['application', 'streamOverlay', 'ingameOverlay'] : ['application'] }] }, null, 2) + '\n');
+await writeFile(new URL('../dist/example-bindings.json', import.meta.url), JSON.stringify({ examples: [{ slug: config.slug, clientId: values.clientId[0], revision: values.revision[0], surfaces: config.surfaces }] }, null, 2) + '\n');

@@ -2,5 +2,8 @@
   "slug": "settings-playground",
   "repository": "https://github.com/W3Booster/app-example-settings-playground",
   "theme": "workbench",
-  "overlay": true
+  "surfaces": [
+    "application",
+    "streamOverlay"
+  ]
 }
