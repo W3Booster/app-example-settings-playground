@@ -77,6 +77,16 @@ try {
     assert.equal(await page.locator(target).first().isVisible(), false, 'stale overlay must not look live');
     await open('view=overlay&demo=1&capture=1&scenario=' + (config.slug === 'settings-playground' ? 'off-air' : 'no-match'));
     assert.equal(await page.locator(target).first().isVisible(), false, 'inactive output must be hidden');
+
+    // CSS transparency alone is insufficient: verify the embedded canvas against
+    // the host background under both compositor color schemes.
+    for (const scheme of ['normal', 'dark']) {
+      await page.setContent('<html style="color-scheme:' + scheme + '"><body style="margin:0;background:rgb(150,40,70)"><iframe style="width:800px;height:600px;border:0;color-scheme:' + config.overlayColorScheme + '" src="' + base + '/?view=overlay&demo=1&capture=1"></iframe></body></html>');
+      await page.frameLocator('iframe').locator('body[data-synchronized="true"]').waitFor();
+      const inside = await page.screenshot({ clip: { x: 780, y: 500, width: 1, height: 1 } });
+      const outside = await page.screenshot({ clip: { x: 1000, y: 500, width: 1, height: 1 } });
+      assert.deepEqual(inside, outside, 'opaque iframe canvas under ' + scheme + ' host');
+    }
   }
   await page.goto(base + '/?demo=0');
   await page.waitForFunction(() => document.body.innerText.includes('Opening localhost directly does not authorize') || document.body.innerText.includes('Could not start'), { timeout: 20000 });

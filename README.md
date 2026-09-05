@@ -41,6 +41,11 @@ In W3Booster, turn on the configured **Stream** or **In-game** surface. For OBS,
 
 ## Fork and use live data
 
+The overlay canvas uses the `normal` browser color scheme, matching the default
+iframe configuration even though its painted UI is dark. Do not add forced-dark
+HTML metadata. Browser tests verify real iframe transparency against colored
+backgrounds under both light and dark host themes.
+
 The checked-in binding identifies the official example. Cloning source does **not** grant ownership or live access.
 
 1. Enable Developer Mode in W3Booster and create your own application.
