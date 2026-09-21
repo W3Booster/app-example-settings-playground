@@ -1,6 +1,6 @@
 {
   "name": "@w3booster/app-example-settings-playground",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Broadcast Controller — a focused W3Booster workflow example",
@@ -21,7 +21,7 @@
     "node": ">=22.22.3"
   },
   "dependencies": {
-    "@w3booster/sdk": "4.0.2"
+    "@w3booster/sdk": "4.6.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

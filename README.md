@@ -87,4 +87,8 @@ MIT licensed; retain [LICENSE](LICENSE) when reusing source. No Warcraft artwork
 
 ## Shared game context
 
-This example uses SDK 4.0.2. Shared HUD scale, chat-input visibility, and team-color mode are available through `gameContext(state)` from `@w3booster/sdk/selectors`, without an additional scope. Request only the match/player data this app consumes. App-specific values belong in `state.application.data`; Match Vision’s score is not shared game context.
+This example uses SDK 4.6.0. Shared HUD scale, chat-input visibility, and team-color mode are available through `gameContext(state)` from `@w3booster/sdk/selectors`, without an additional scope. Request only the match/player data this app consumes. App-specific values belong in `state.application.data`; Match Vision’s score is not shared game context.
+
+## Current SDK guides
+
+This app pins published SDK 4.6.0. See [data availability](https://w3booster.com/developer/data-availability/), [analytics](https://w3booster.com/developer/analytics/), [settings and shortcuts](https://w3booster.com/developer/settings/) and the [upgrade guide](https://w3booster.com/developer/upgrading/) before adding features. Optional fields can be absent; request only the data your app uses.
